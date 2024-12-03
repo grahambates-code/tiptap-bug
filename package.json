@@ -45,7 +45,7 @@
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.31.10",
-    "prettier": "^2.7.1",
+    "prettier": "^3.4.1",
     "typescript": "*",
     "vite": "6.0.2"
   }
