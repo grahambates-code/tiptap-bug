@@ -2,7 +2,7 @@ import React from "react";
 import { ChakraProvider, Box, Heading, Flex, Link, Image, Text } from "@chakra-ui/react";
 import reactLogo from "./assets/react.svg";
 import tiptapLogo from "./assets/tiptap.svg";
-import { DemoEditor } from "./Editor";
+import Example  from "./Example";
 import viteLogo from "/vite.svg";
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
                     boxShadow="lg"
                     bg="white"
                 >
-                    <DemoEditor />
+                    <Example />
                 </Box>
 
                 {/* Footer Text */}
