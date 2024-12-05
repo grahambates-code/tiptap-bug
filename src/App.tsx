@@ -2,7 +2,7 @@ import React from "react";
 import { ChakraProvider, Box, Heading, Flex, Link, Image, Text } from "@chakra-ui/react";
 import reactLogo from "./assets/react.svg";
 import tiptapLogo from "./assets/tiptap.svg";
-import Example  from "./Example";
+import Example  from "./Example2";
 import viteLogo from "/vite.svg";
 
 function App() {

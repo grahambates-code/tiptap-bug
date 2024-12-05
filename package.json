@@ -13,9 +13,7 @@
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run lint:fix"
   },
-  "resolutions": {
-    "prosemirror-model": "^1.18.1"
-  },
+
   "dependencies": {
     "@chakra-ui/react": "2.10.3",
     "@emotion/react": "^11.13.5",
@@ -23,9 +21,9 @@
     "@tiptap/extension-highlight": "^2.10.3",
     "@tiptap/extension-image": "^2.10.3",
     "@tiptap/extension-link": "^2.10.3",
-    "@tiptap/react": "^2.10.3",
-    "@tiptap/starter-kit": "^2.10.3",
-    "@tiptap/suggestion": "^2.10.3",
+    "@tiptap/react": "^2.9.0",
+    "@tiptap/starter-kit": "^2.9.0",
+    "@tiptap/suggestion": "^2.9.0",
     "deck.gl": "^9.0.36",
     "framer-motion": "^11.13.1",
     "lodash": "^4.17.21",
