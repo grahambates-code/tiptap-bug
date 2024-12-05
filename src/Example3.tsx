@@ -77,7 +77,7 @@ const CustomNode = Node.create({
 });
 
 // React Component for CustomNodeView
-const CustomNodeView = ({ editor }) => {
+const CustomNodeView = ({ editor, node }) => {
     const [viewState, setViewState] = useState({
         longitude: -122.4,
         latitude: 37.74,
