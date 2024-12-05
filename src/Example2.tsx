@@ -64,6 +64,15 @@ const CustomNode = Node.create({
     addNodeView() {
         return ReactNodeViewRenderer(CustomNodeView)
     },
+
+    // addKeyboardShortcuts() {
+    //     return {
+    //         Enter: ({ editor }) => {
+    //             // Insert a new paragraph when pressing Enter
+    //             return editor.chain().focus().insertParagraph().run()
+    //         },
+    //     }
+    // },
 })
 
 // The React component for the NodeView
@@ -96,6 +105,7 @@ const App = () => {
         content: `
       <p>This is a sample editor.</p>
       <customNode>Editable <strong>content</strong> here</customNode>
+      <p>Another paragraph.</p>
     `,
         editorProps: {
             handleClickOn(view, pos, node, nodePos, event) {
@@ -113,6 +123,23 @@ const App = () => {
 
                 return false
             },
+        },
+        onUpdate: ({ editor }) => {
+            const { state } = editor
+            const firstNode = state.doc.firstChild
+            const lastNode = state.doc.lastChild
+
+            editor.chain().focus()
+
+            // Ensure the first node is a paragraph
+            if (firstNode.type.name !== 'paragraph') {
+                editor.chain().insertContentAt(0, { type: 'paragraph' }).run()
+            }
+
+            // Ensure the last node is a paragraph
+            if (lastNode.type.name !== 'paragraph') {
+                editor.chain().insertContentAt(state.doc.content.size, { type: 'paragraph' }).run()
+            }
         },
     })
 
