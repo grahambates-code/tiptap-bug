@@ -2,13 +2,13 @@ import React from "react";
 import { ChakraProvider, Box, Heading, Flex, Link, Image, Text } from "@chakra-ui/react";
 import reactLogo from "./assets/react.svg";
 import tiptapLogo from "./assets/tiptap.svg";
-import Example  from "./Example3";
+import Example from "./Example3";
 import viteLogo from "/vite.svg";
 
 function App() {
     return (
         <ChakraProvider>
-            <Box textAlign="center" p={5}>
+            <Box textAlign="center" p={5} style={{ width: 1000 }}>
                 {/* Logo Links */}
                 <Flex justifyContent="center" gap={6} mb={5}>
                     <Link href="https://vitejs.dev" isExternal>
