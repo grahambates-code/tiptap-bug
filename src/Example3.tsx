@@ -44,6 +44,15 @@ const ViewStateMark = Mark.create({
         ];
     },
 
+    addCommands() {
+        return {
+            setViewStateMark: (viewState) => ({ chain }) => {
+                return chain()
+                    .setMark('viewState', { viewState: JSON.stringify(viewState) })
+                    .run()
+            }
+        }
+    },
     addNodeView() {
         return ReactNodeViewRenderer((props: NodeViewRendererProps) => (
             <CustomNodeView {...props} setShowPopup={this.setShowPopup} />
@@ -186,20 +195,7 @@ const EditorWithCustomNodes = () => {
                 hasCustomNode = false;
             }
         },
-        commands: {
-            setViewStateMark: (viewState: any) => {
-                return (state, dispatch) => {
-                    const { from, to } = state.selection;
-                    const tr = state.tr;
-                    const mark = ViewStateMark.create({ viewState });
-                    tr.addMark(from, to, mark);
-                    if (dispatch) {
-                        dispatch(tr);
-                    }
-                    return true;
-                };
-            },
-        }
+
     });
 
     const handlePopupSelect = (option: any) => {
