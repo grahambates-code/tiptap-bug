@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent, NodeViewWrapper, NodeViewContent, NodeViewRendererProps } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Node } from '@tiptap/core';
@@ -9,14 +9,13 @@ import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer } from 'deck.gl';
 import { background, Box, Button, VStack } from '@chakra-ui/react';
 
-// Define the ViewStateMark
 const ViewStateMark = Mark.create({
     name: 'viewState',
 
     addAttributes() {
         return {
             viewState: {
-                default: null, // Stores the serialized viewState
+                default: null,
             },
         };
     },
@@ -44,22 +43,24 @@ const ViewStateMark = Mark.create({
         ];
     },
 
-    addNodeView() {
-        return ReactNodeViewRenderer((props: NodeViewRendererProps) => (
-            <CustomNodeView {...props} setShowPopup={this.setShowPopup} />
-        ));
+    addCommands() {
+        return {
+            setViewStateMark: (viewState) => ({ commands }) => {
+                return commands.setMark(this.name, { viewState: JSON.stringify(viewState) });
+            },
+        };
     },
 });
 
-// Define the CustomNode
+
 const CustomNode = Node.create({
     name: 'customNode',
 
     group: 'block',
 
-    content: 'inline*', // Allow inline editable content within the node
+    content: 'inline*',
 
-    draggable: true, // Enable drag-and-drop
+    draggable: true,
 
     parseHTML() {
         return [{ tag: 'customNode' }];
@@ -85,7 +86,6 @@ const CustomNodeView = ({ editor, node, setShowPopup }) => {
         pitch: 0,
         bearing: 0,
     });
-
 
     const markSelectedTextWithViewState = () => {
         if (editor && editor.state.selection) {
@@ -165,41 +165,55 @@ const EditorWithCustomNodes = () => {
 
     const [showPopup, setShowPopup] = useState(false);
     const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+    const preventSlash = useRef<boolean>(false);
 
     const editor = useEditor({
         extensions: [StarterKit, ViewStateMark, CustomNode],
         content: `...`,
-        onUpdate: ({ editor }) => {
-            const { from, to } = editor.state.selection;
-            const text = editor.getText(from, to);
-            let hasCustomNode = editor.state.doc.content.content[editor.state.doc.content.content.length - 1]?.type.name === 'customNode';
-            console.log(hasCustomNode);
-            if (text.includes('/') && !hasCustomNode) {
-                const { top, left } = editor.view.coordsAtPos(from);
-                const popupHeight = 40;
-                const scrollY = window.scrollY;
-                setPopupPosition({ top: top + popupHeight + scrollY, left });
-                setShowPopup(true);
-                hasCustomNode = false;
-            } else {
-                setShowPopup(false);
-                hasCustomNode = false;
-            }
-        },
-        commands: {
-            setViewStateMark: (viewState: any) => {
-                return (state, dispatch) => {
-                    const { from, to } = state.selection;
-                    const tr = state.tr;
-                    const mark = ViewStateMark.create({ viewState });
-                    tr.addMark(from, to, mark);
-                    if (dispatch) {
-                        dispatch(tr);
-                    }
+        editorProps: {
+            handleKeyDown: (view, event) => {
+              if (event.key === 'Enter') {
+                const { $from } = view.state.selection;
+                const parentNode = $from.parent;
+                
+                if (parentNode.type.name === 'customNode') {
+                  const parentOffset = $from.parentOffset; 
+                  const nodeSize = parentNode.content.size;
+                  
+                  if (parentOffset >= nodeSize) {
+                    return false;
+                  } else {
+                    event.preventDefault();
+                    view.dispatch(view.state.tr.insertText('\n'));
                     return true;
-                };
+                  }
+                }
+              }
+              return false;
             },
-        }
+          },
+        onUpdate: ({ editor }) => {
+            const { from } = editor.state.selection;
+            const text = editor.state.doc.textBetween(from - 1, from);
+            
+            const pos = editor.state.selection.$from.pos;
+            const node = editor.state.doc.nodeAt(pos);
+            const parentNode = editor.state.doc.resolve(pos).parent;
+            
+            const isCustomNode = node?.type.name === 'customNode' || parentNode?.type.name === 'customNode';
+            preventSlash.current = isCustomNode;
+          
+            if (text === '/' && !preventSlash.current) {
+              const coords = editor.view.coordsAtPos(from);
+              setPopupPosition({
+                top: coords.top + 40 + window.scrollY,
+                left: coords.left,
+              });
+              setShowPopup(true);
+            } else {
+              setShowPopup(false);
+            }
+          },
     });
 
     const handlePopupSelect = (option: any) => {
